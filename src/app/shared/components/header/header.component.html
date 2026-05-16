@@ -1,1 +1,54 @@
-<p>header works!</p>
+<header class="header">
+  <!-- Logo -->
+  <div class="logo-mark">
+    <svg viewBox="0 0 16 16" fill="white">
+      <path d="M8 1L2 4v4c0 3.3 2.5 6.4 6 7 3.5-.6 6-3.7 6-7V4L8 1z" />
+    </svg>
+  </div>
+  <span class="logo-txt">HR<em>MS</em></span>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <i class="ti ti-search"></i>
+    Search employees, payroll…
+  </div>
+
+  <!-- Right actions -->
+  <div class="header-right">
+    <!-- Role badge -->
+    <span
+      class="role-chip"
+      [ngClass]="{
+        admin: role === 'Admin',
+        hr: role === 'HR',
+        employee: role === 'Employee',
+      }"
+    >
+      {{ role }}
+    </span>
+
+    <!-- Notification -->
+    <button class="ico-btn">
+      <i class="ti ti-bell"></i>
+      <span class="notif-dot"></span>
+    </button>
+
+    <!-- Logout -->
+    <button class="ico-btn" (click)="logout()" title="Logout">
+      <i class="ti ti-logout"></i>
+    </button>
+
+    <!-- Avatar -->
+    <div
+      class="avatar"
+      [title]="username"
+      [ngClass]="{
+        'avatar-admin': role === 'Admin',
+        'avatar-hr': role === 'HR',
+        'avatar-employee': role === 'Employee',
+      }"
+    >
+      {{ initials }}
+    </div>
+  </div>
+</header>

@@ -1,1 +1,71 @@
-<p>sidebar works!</p>
+<nav class="sidebar">
+
+  <!-- Main -->
+  <ng-container *ngFor="let item of mainNav">
+    
+      *ngIf="canSee(item)"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-item">
+      <i [ngClass]="['ti', item.icon]"></i>
+      {{ item.label }}
+    </a>
+  </ng-container>
+
+  <!-- People -->
+  <div class="nav-section">People</div>
+  <ng-container *ngFor="let item of peopleNav">
+    
+      *ngIf="canSee(item)"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav-item">
+      <i [ngClass]="['ti', item.icon]"></i>
+      {{ item.label }}
+    </a>
+  </ng-container>
+
+  <!-- Compensation -->
+  <div class="nav-section">Compensation</div>
+  <ng-container *ngFor="let item of compensationNav">
+    
+      *ngIf="canSee(item)"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-item">
+      <i [ngClass]="['ti', item.icon]"></i>
+      {{ item.label }}
+    </a>
+  </ng-container>
+
+  <!-- Payroll -->
+  <div class="nav-section">Payroll</div>
+  <ng-container *ngFor="let item of payrollNav">
+    
+      *ngIf="canSee(item)"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav-item">
+      <i [ngClass]="['ti', item.icon]"></i>
+      {{ item.label }}
+    </a>
+  </ng-container>
+
+  <!-- System — sticks to bottom -->
+  <div class="nav-footer">
+    <div class="nav-section" style="margin-top:0">System</div>
+    <ng-container *ngFor="let item of systemNav">
+      
+        *ngIf="canSee(item)"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item">
+        <i [ngClass]="['ti', item.icon]"></i>
+        {{ item.label }}
+      </a>
+    </ng-container>
+  </div>
+
+</nav>

@@ -1,0 +1,59 @@
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+  margin-top: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-decoration: none;
+  font-size: 13px;
+
+  i {
+    font-size: 17px;
+    width: 20px;
+  }
+
+  &:hover {
+    background: var(--border-2);
+    color: var(--text);
+  }
+
+  // ← NgClass active applied by routerLinkActive
+  &.active {
+    background: var(--accent-light);
+    color: var(--accent-mid);
+    font-weight: 500;
+
+    i {
+      color: var(--accent);
+    }
+  }
+}
+
+.nav-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
