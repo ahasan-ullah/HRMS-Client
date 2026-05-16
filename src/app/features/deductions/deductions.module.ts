@@ -1,14 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Routes } from '@angular/router';
+import { DeductionListComponent } from './pages/deduction-list/deduction-list.component';
 
-import { DeductionsRoutingModule } from './deductions-routing.module';
-
-
-@NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    DeductionsRoutingModule
-  ]
-})
-export class DeductionsModule { }
+export const deductionRoutes: Routes = [
+  { path: '', component: DeductionListComponent }
+];

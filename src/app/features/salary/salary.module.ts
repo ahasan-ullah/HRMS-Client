@@ -1,14 +1,8 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Routes } from '@angular/router';
+import { SalaryListComponent } from './pages/salary-list/salary-list.component';
+import { SalaryRevisionHistoryComponent } from './pages/salary-revision-history/salary-revision-history.component';
 
-import { SalaryRoutingModule } from './salary-routing.module';
-
-
-@NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    SalaryRoutingModule
-  ]
-})
-export class SalaryModule { }
+export const salaryRoutes: Routes = [
+  { path: '', component: SalaryListComponent },
+  { path: 'revisions', component: SalaryRevisionHistoryComponent }
+];

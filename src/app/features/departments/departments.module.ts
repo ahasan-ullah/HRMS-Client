@@ -1,14 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Routes } from '@angular/router';
+import { DepartmentListComponent } from './pages/department-list/department-list.component';
 
-import { DepartmentsRoutingModule } from './departments-routing.module';
-
-
-@NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    DepartmentsRoutingModule
-  ]
-})
-export class DepartmentsModule { }
+export const departmentRoutes: Routes = [
+  { path: '', component: DepartmentListComponent }
+];

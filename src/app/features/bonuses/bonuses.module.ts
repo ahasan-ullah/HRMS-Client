@@ -1,14 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Routes } from '@angular/router';
+import { BonusListComponent } from './pages/bonus-list/bonus-list.component';
 
-import { BonusesRoutingModule } from './bonuses-routing.module';
-
-
-@NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    BonusesRoutingModule
-  ]
-})
-export class BonusesModule { }
+export const bonusRoutes: Routes = [
+  { path: '', component: BonusListComponent }
+];

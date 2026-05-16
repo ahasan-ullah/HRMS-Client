@@ -1,14 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Routes } from '@angular/router';
+import { UserListComponent } from './pages/user-list/user-list.component';
 
-import { UsersRoutingModule } from './users-routing.module';
-
-
-@NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    UsersRoutingModule
-  ]
-})
-export class UsersModule { }
+export const userRoutes: Routes = [
+  { path: '', component: UserListComponent }
+];
