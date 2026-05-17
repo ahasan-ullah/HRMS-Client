@@ -23,10 +23,10 @@
   </ng-container>
 
   <!-- People -->
-  <div class="nav-section">People</div>
+  <div class="nav-section" *ngIf="!isEmployee">People</div>
   <ng-container *ngFor="let item of peopleNav">
     <a
-      *ngIf="canSee(item)"
+      *ngIf="!isEmployee && canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       class="nav-item">
@@ -37,10 +37,10 @@
   </ng-container>
 
   <!-- Compensation -->
-  <div class="nav-section">Compensation</div>
+  <div class="nav-section" *ngIf="!isEmployee">Compensation</div>
   <ng-container *ngFor="let item of compensationNav">
     <a
-      *ngIf="canSee(item)"
+      *ngIf="!isEmployee && canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -52,10 +52,10 @@
   </ng-container>
 
   <!-- Payroll -->
-  <div class="nav-section">Payroll</div>
+  <div class="nav-section" *ngIf="!isEmployee">Payroll</div>
   <ng-container *ngFor="let item of payrollNav">
     <a
-      *ngIf="canSee(item)"
+      *ngIf="!isEmployee && canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       class="nav-item">
@@ -67,10 +67,10 @@
 
   <!-- System — sticks to bottom -->
   <div class="nav-footer">
-    <div class="nav-section" style="margin-top:0">System</div>
+    <div class="nav-section" style="margin-top:0" *ngIf="!isEmployee">System</div>
     <ng-container *ngFor="let item of systemNav">
       <a
-        *ngIf="canSee(item)"
+        *ngIf="!isEmployee && canSee(item)"
         [routerLink]="item.route"
         routerLinkActive="active"
         class="nav-item">

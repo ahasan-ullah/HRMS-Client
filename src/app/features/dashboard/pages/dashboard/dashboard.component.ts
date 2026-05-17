@@ -10,6 +10,7 @@ import { DepartmentService } from '../../../../core/services/department.service'
 import { SalaryService } from '../../../../core/services/salary.service';
 import { BonusService } from '../../../../core/services/bonus.service';
 import { DeductionService } from '../../../../core/services/deduction.service';
+import { UserService } from '../../../../core/services/user.service';
 import { EmployeeDTO } from '../../../../core/models/employee.model';
 import { PayrollDTO } from '../../../../core/models/payroll.model';
 import { DepartmentDTO } from '../../../../core/models/department.model';
@@ -57,6 +58,7 @@ export class DashboardComponent implements OnInit {
     private salaryService: SalaryService,
     private bonusService: BonusService,
     private deductionService: DeductionService,
+    private userService: UserService,
   ) {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
@@ -129,12 +131,9 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadEmployeeFallback() {
-    const employeeId = this.authService.getUserId();
-
-    return this.employeeService.getById(employeeId).pipe(
-      catchError(() => of(null)),
-      switchMap(employee => {
-        if (!employee) {
+    return this.resolveEmployeeId().pipe(
+      switchMap(employeeId => {
+        if (!employeeId) {
           return of({
             employee: null,
             department: null,
@@ -144,22 +143,51 @@ export class DashboardComponent implements OnInit {
           } as EmployeeDashboardDTO);
         }
 
-        return forkJoin({
-          department: this.departmentService.getById(employee.departmentId).pipe(catchError(() => of(null))),
-          salary: this.salaryService.getActiveByEmployee(employee.employeeId).pipe(catchError(() => of(null))),
-          bonuses: this.bonusService.getByEmployee(employee.employeeId).pipe(catchError(() => of([] as BonusDTO[]))),
-          deductions: this.deductionService.getByEmployee(employee.employeeId).pipe(catchError(() => of([] as DeductionDTO[]))),
-        }).pipe(
-          catchError(() => of({ department: null, salary: null, bonuses: [], deductions: [] })),
-          map(details => ({
-            employee,
-            department: details.department,
-            salary: details.salary,
-            bonuses: details.bonuses ?? [],
-            deductions: details.deductions ?? [],
-          } as EmployeeDashboardDTO))
+        return this.employeeService.getById(employeeId).pipe(
+          catchError(() => of(null)),
+          switchMap(employee => {
+            if (!employee) {
+              return of({
+                employee: null,
+                department: null,
+                salary: null,
+                bonuses: [],
+                deductions: [],
+              } as EmployeeDashboardDTO);
+            }
+
+            return forkJoin({
+              department: this.departmentService.getById(employee.departmentId).pipe(catchError(() => of(null))),
+              salary: this.salaryService.getActiveByEmployee(employee.employeeId).pipe(catchError(() => of(null))),
+              bonuses: this.bonusService.getByEmployee(employee.employeeId).pipe(catchError(() => of([] as BonusDTO[]))),
+              deductions: this.deductionService.getByEmployee(employee.employeeId).pipe(catchError(() => of([] as DeductionDTO[]))),
+            }).pipe(
+              catchError(() => of({ department: null, salary: null, bonuses: [], deductions: [] })),
+              map(details => ({
+                employee,
+                department: details.department,
+                salary: details.salary,
+                bonuses: details.bonuses ?? [],
+                deductions: details.deductions ?? [],
+              } as EmployeeDashboardDTO))
+            );
+          })
         );
       })
+    );
+  }
+
+  private resolveEmployeeId() {
+    const fallbackEmployeeId = this.authService.getUserId();
+    const username = this.username || this.authService.getUsername();
+
+    if (!username) {
+      return of(fallbackEmployeeId);
+    }
+
+    return this.userService.getByUsername(username).pipe(
+      map(user => user.employeeId ?? fallbackEmployeeId),
+      catchError(() => of(fallbackEmployeeId))
     );
   }
 

@@ -48,6 +48,10 @@ export class SidebarComponent {
     this.role = this.authService.getRole();
   }
 
+  get isEmployee(): boolean {
+    return this.role === 'Employee';
+  }
+
   canSee(item: NavItem): boolean {
     if (!item.roles || item.roles.length === 0) return true;
     return item.roles.includes(this.role);
