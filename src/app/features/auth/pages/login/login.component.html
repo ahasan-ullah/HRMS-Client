@@ -46,7 +46,6 @@
         <div class="form-group">
           <div class="label-row">
             <label class="f-label">Password</label>
-            <button type="button">Forgot?</button>
           </div>
           <input
             class="f-input"
@@ -69,18 +68,6 @@
           {{ loading ? "Signing in..." : "Sign in" }}
           <i class="ti ti-arrow-right" *ngIf="!loading"></i>
         </button>
-      </div>
-
-      <div class="login-hints">
-        <strong>Demo credentials</strong>
-        <div class="hint-row">
-          <span>Admin</span>
-          <b>admin / Admin&#64;123</b>
-        </div>
-        <div class="hint-row">
-          <span>Employee</span>
-          <b>firstname+ID / EMP+ID</b>
-        </div>
       </div>
     </div>
   </main>
