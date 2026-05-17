@@ -34,15 +34,34 @@ export class EmployeeService {
   // search covers status filtering in BLL
 
   create(dto: EmployeeDTO): Observable<any> {
-    return this.http.post(`${this.url}/create`, dto);
+    return this.http.post(`${this.url}/create`, this.toApiDto(dto));
   }
 
   // Note: update sends full object in body — no id in URL
   update(dto: EmployeeDTO): Observable<any> {
-    return this.http.put(`${this.url}/update`, dto);
+    return this.http.put(`${this.url}/update`, this.toApiDto(dto));
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.url}/delete/${id}`);
+  }
+
+  private toApiDto(dto: EmployeeDTO): Record<string, unknown> {
+    return {
+      EmployeeId: dto.employeeId,
+      DepartmentId: dto.departmentId,
+      FirstName: dto.firstName,
+      LastName: dto.lastName,
+      Email: dto.email,
+      Phone: dto.phone,
+      Address: dto.address,
+      Position: dto.position,
+      AccountNumber: dto.accountNumber,
+      EmploymentStatus: dto.employmentStatus,
+      JoiningDate: dto.joiningDate,
+      IsActive: dto.isActive,
+      CreatedAt: dto.createdAt,
+      UpdatedAt: dto.updatedAt,
+    };
   }
 }

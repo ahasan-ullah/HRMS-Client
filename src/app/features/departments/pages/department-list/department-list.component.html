@@ -1,1 +1,120 @@
-<p>department-list works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Departments</h1>
+      <span class="sub">{{ departments.length }} departments</span>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <i class="ti ti-plus"></i> Add Department
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="loading">
+    <i class="ti ti-loader-2 spin"></i> Loading…
+  </div>
+
+  <!-- Department cards -->
+  <div class="three-col" *ngIf="!loading">
+    <div class="dept-card card" *ngFor="let dept of departments; let i = index">
+      <div class="dept-card-top">
+        <div
+          class="dept-icon"
+          [style.background]="getColor(i)"
+          [style.color]="getIconColor(i)"
+        >
+          <i [ngClass]="['ti', getIcon(i)]"></i>
+        </div>
+        <div class="dept-actions">
+          <button class="ico-btn" (click)="openEdit(dept)" title="Edit">
+            <i class="ti ti-edit"></i>
+          </button>
+          <button
+            class="ico-btn danger"
+            (click)="confirmDelete(dept.departmentId)"
+            title="Delete"
+          >
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="dept-name">{{ dept.name }}</div>
+      <div class="dept-desc">{{ dept.description || "No description" }}</div>
+
+      <div class="dept-footer">
+        <span class="dept-count">
+          <i class="ti ti-users"></i>
+          {{ dept.employeeCount }} employees
+        </span>
+        <span class="pill active">Active</span>
+      </div>
+    </div>
+
+    <div class="empty-card" *ngIf="departments.length === 0">
+      No departments found
+    </div>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>{{ isEdit ? "Edit Department" : "New Department" }}</h2>
+      <button class="ico-btn" (click)="closeModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <div class="form-grid" style="grid-template-columns: 1fr">
+      <div class="form-group">
+        <label class="f-label">Name *</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.name"
+          placeholder="e.g. Engineering"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Description</label>
+        <textarea
+          class="f-textarea"
+          [(ngModel)]="dto.description"
+          placeholder="Brief description of this department"
+        >
+        </textarea>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeModal()">Cancel</button>
+      <button class="btn-primary" (click)="save()" [disabled]="saving">
+        <i class="ti ti-loader-2 spin" *ngIf="saving"></i>
+        <i class="ti ti-check" *ngIf="!saving"></i>
+        {{ saving ? "Saving…" : isEdit ? "Update" : "Create" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal">
+  <div class="modal" style="width: 380px">
+    <div class="modal-head">
+      <h2>Delete Department</h2>
+      <button class="ico-btn" (click)="cancelDelete()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <p style="color: var(--muted); font-size: 13px">
+      Are you sure? Departments with active employees cannot be deleted.
+    </p>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="deleteDepartment()">
+        <i class="ti ti-trash"></i> Delete
+      </button>
+    </div>
+  </div>
+</div>

@@ -18,7 +18,10 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(dto: LoginDTO): Observable<TokenResponseDTO> {
-    return this.http.post<TokenResponseDTO>(`${this.url}/login`, dto).pipe(
+    return this.http.post<TokenResponseDTO>(`${this.url}/login`, {
+      Username: dto.username,
+      Password: dto.password,
+    }).pipe(
       tap(res => {
         localStorage.setItem('accessToken', res.accessToken);
         localStorage.setItem('refreshToken', res.refreshToken);
@@ -30,7 +33,9 @@ export class AuthService {
   }
 
   refresh(dto: RefreshTokenDTO): Observable<TokenResponseDTO> {
-    return this.http.post<TokenResponseDTO>(`${this.url}/refresh`, dto).pipe(
+    return this.http.post<TokenResponseDTO>(`${this.url}/refresh`, {
+      RefreshToken: dto.refreshToken,
+    }).pipe(
       tap(res => {
         localStorage.setItem('accessToken', res.accessToken);
         localStorage.setItem('refreshToken', res.refreshToken);
@@ -45,11 +50,18 @@ export class AuthService {
   }
 
   changePassword(dto: ChangePasswordDTO): Observable<any> {
-    return this.http.put(`${this.url}/change-password`, dto);
+    return this.http.put(`${this.url}/change-password`, {
+      UserId: dto.userId,
+      CurrentPassword: dto.currentPassword,
+      NewPassword: dto.newPassword,
+    });
   }
 
   assignRole(dto: AssignRoleDTO): Observable<any> {
-    return this.http.put(`${this.url}/assign-role`, dto);
+    return this.http.put(`${this.url}/assign-role`, {
+      UserId: dto.userId,
+      Role: dto.role,
+    });
   }
 
   // ── Local helpers ─────────────────────────────────────
@@ -67,7 +79,18 @@ export class AuthService {
   }
 
   getUserId(): number {
-    return parseInt(localStorage.getItem('userId') ?? '0');
+    const storedUserId = parseInt(localStorage.getItem('userId') ?? '0', 10);
+    if (storedUserId > 0) return storedUserId;
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) return 0;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1] ?? ''));
+      return Number(payload.userId ?? payload.UserId ?? payload.nameid ?? 0);
+    } catch {
+      return 0;
+    }
   }
 
   getUsername(): string {

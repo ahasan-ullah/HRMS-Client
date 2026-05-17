@@ -25,15 +25,27 @@ export class BonusService {
   }
 
   create(dto: BonusDTO): Observable<any> {
-    return this.http.post(`${this.url}/create`, dto);
+    return this.http.post(`${this.url}/create`, this.toApiDto(dto));
   }
 
   // Note: update sends full object in body — no id in URL
   update(dto: BonusDTO): Observable<any> {
-    return this.http.put(`${this.url}/update`, dto);
+    return this.http.put(`${this.url}/update`, this.toApiDto(dto));
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.url}/delete/${id}`);
+  }
+
+  private toApiDto(dto: BonusDTO): Record<string, unknown> {
+    return {
+      BonusId: dto.bonusId,
+      EmployeeId: dto.employeeId,
+      BonusType: dto.bonusType,
+      Amount: dto.amount,
+      BonusDate: dto.bonusDate,
+      Reason: dto.reason,
+      CreatedAt: dto.createdAt,
+    };
   }
 }

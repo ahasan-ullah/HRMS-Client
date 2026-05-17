@@ -1,1 +1,87 @@
-<p>login works!</p>
+<div class="login-wrap">
+  <section class="login-story">
+    <a class="story-brand">
+      <span class="brand-mark"><i class="ti ti-shield-check"></i></span>
+      <span class="brand-copy">
+        <strong>HRMS</strong>
+        <small>Workforce OS</small>
+      </span>
+    </a>
+
+    <div class="story-copy">
+      <span class="eyebrow">A calmer payroll</span>
+      <h1>Run people, payroll, and policy from one quiet console.</h1>
+      <p>
+        Track employees, departments, salary revisions, deductions, bonuses,
+        and payroll batches without the noise.
+      </p>
+    </div>
+
+    <div class="story-foot">
+      <span>SOC 2 ready</span>
+      <span>Role-based</span>
+      <span>Audit log</span>
+    </div>
+  </section>
+
+  <main class="login-panel">
+    <div class="login-card">
+      <span class="eyebrow">Welcome back</span>
+      <h2>Sign in to your account</h2>
+      <p>Use your HRMS credentials to continue.</p>
+
+      <div class="login-form">
+        <div class="form-group">
+          <label class="f-label">Username</label>
+          <input
+            class="f-input"
+            type="text"
+            [(ngModel)]="dto.username"
+            (keyup)="onEnter($event)"
+            [ngClass]="{ 'error-border': error }"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label class="f-label">Password</label>
+            <button type="button">Forgot?</button>
+          </div>
+          <input
+            class="f-input"
+            type="password"
+            [(ngModel)]="dto.password"
+            (keyup)="onEnter($event)"
+            [ngClass]="{ 'error-border': error }"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button
+          class="btn-primary login-btn"
+          (click)="login()"
+          [disabled]="loading"
+          [ngClass]="{ loading: loading }"
+        >
+          <i class="ti ti-loader-2 spin" *ngIf="loading"></i>
+          <i class="ti ti-login-2" *ngIf="!loading"></i>
+          {{ loading ? "Signing in..." : "Sign in" }}
+          <i class="ti ti-arrow-right" *ngIf="!loading"></i>
+        </button>
+      </div>
+
+      <div class="login-hints">
+        <strong>Demo credentials</strong>
+        <div class="hint-row">
+          <span>Admin</span>
+          <b>admin / Admin&#64;123</b>
+        </div>
+        <div class="hint-row">
+          <span>Employee</span>
+          <b>firstname+ID / EMP+ID</b>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

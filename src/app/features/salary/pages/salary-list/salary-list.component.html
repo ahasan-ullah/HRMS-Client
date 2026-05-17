@@ -1,1 +1,257 @@
-<p>salary-list works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Salary</h1>
+      <span class="sub">{{ salaries.length }} records</span>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <i class="ti ti-plus"></i> Assign Salary
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="loading-row" *ngIf="loading">
+      <i class="ti ti-loader-2 spin"></i> Loading…
+    </div>
+    <table class="tbl" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Basic</th>
+          <th>House Allow.</th>
+          <th>Medical Allow.</th>
+          <th>Transport Allow.</th>
+          <th>Gross</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of salaries; let i = index">
+          <td>
+            <div class="emp-cell">
+              <div class="av" [style.background]="getAvatarColor(i)">
+                {{ getInitials(s.employeeId) }}
+              </div>
+              <div class="emp-name">{{ getEmployeeName(s.employeeId) }}</div>
+            </div>
+          </td>
+          <td>৳{{ s.basicSalary | number: "1.0-0" }}</td>
+          <td class="td-muted">৳{{ s.houseAllowance | number: "1.0-0" }}</td>
+          <td class="td-muted">৳{{ s.medicalAllowance | number: "1.0-0" }}</td>
+          <td class="td-muted">
+            ৳{{ s.transportAllowance | number: "1.0-0" }}
+          </td>
+          <td style="font-weight: 500; color: var(--accent)">
+            ৳{{ s.grossSalary | number: "1.0-0" }}
+          </td>
+          <td>
+            <span class="pill" [ngClass]="s.isActive ? 'active' : 'inactive'">
+              {{ s.isActive ? "Active" : "Inactive" }}
+            </span>
+          </td>
+          <td>
+            <div class="action-row">
+              <button class="ico-btn" (click)="openEdit(s)" title="Edit">
+                <i class="ti ti-edit"></i>
+              </button>
+              <button
+                class="ico-btn"
+                (click)="openRevise(s)"
+                title="Revise"
+                style="color: var(--accent)"
+              >
+                <i class="ti ti-arrow-up"></i>
+              </button>
+              <button
+                class="ico-btn danger"
+                (click)="delete(s.salaryId)"
+                title="Delete"
+              >
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="salaries.length === 0">
+          <td colspan="8" class="empty-row">No salary records found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal-overlay" *ngIf="showCreateModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Assign Salary</h2>
+      <button class="ico-btn" (click)="showCreateModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="f-label">Employee *</label>
+        <select class="f-select" [(ngModel)]="createDto.employeeId">
+          <option [value]="0" disabled>Select employee…</option>
+          <option *ngFor="let e of employees" [value]="e.employeeId">
+            {{ e.firstName }} {{ e.lastName }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="f-label">Basic Salary *</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="createDto.basicSalary"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">House Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="createDto.houseAllowance"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Medical Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="createDto.medicalAllowance"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Transport Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="createDto.transportAllowance"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group full">
+        <label class="f-label">Remarks</label>
+        <input
+          class="f-input"
+          [(ngModel)]="createDto.remarks"
+          placeholder="Optional note"
+        />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showCreateModal = false">
+        Cancel
+      </button>
+      <button class="btn-primary" (click)="create()" [disabled]="saving">
+        <i class="ti ti-check"></i> {{ saving ? "Saving…" : "Assign" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" *ngIf="showEditModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Edit Salary</h2>
+      <button class="ico-btn" (click)="showEditModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="f-label">Basic Salary *</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="editDto.basicSalary"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">House Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="editDto.houseAllowance"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Medical Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="editDto.medicalAllowance"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Transport Allowance</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="editDto.transportAllowance"
+        />
+      </div>
+      <div class="form-group full">
+        <label class="f-label">Remarks</label>
+        <input class="f-input" [(ngModel)]="editDto.remarks" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showEditModal = false">Cancel</button>
+      <button class="btn-primary" (click)="update()" [disabled]="saving">
+        <i class="ti ti-check"></i> {{ saving ? "Saving…" : "Update" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Revise Modal -->
+<div class="modal-overlay" *ngIf="showReviseModal">
+  <div class="modal" style="width: 420px">
+    <div class="modal-head">
+      <h2>Revise Salary</h2>
+      <button class="ico-btn" (click)="showReviseModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid" style="grid-template-columns: 1fr">
+      <div class="form-group">
+        <label class="f-label">Current Basic Salary</label>
+        <input class="f-input" [value]="reviseDto.oldSalary" disabled />
+      </div>
+      <div class="form-group">
+        <label class="f-label">New Basic Salary *</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="reviseDto.newSalary"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Reason</label>
+        <input
+          class="f-input"
+          [(ngModel)]="reviseDto.reason"
+          placeholder="e.g. Annual increment"
+        />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showReviseModal = false">
+        Cancel
+      </button>
+      <button class="btn-primary" (click)="revise()" [disabled]="saving">
+        <i class="ti ti-arrow-up"></i>
+        {{ saving ? "Revising…" : "Apply Revision" }}
+      </button>
+    </div>
+  </div>
+</div>

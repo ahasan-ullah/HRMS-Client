@@ -19,15 +19,25 @@ export class DepartmentService {
   }
 
   create(dto: DepartmentDTO): Observable<any> {
-    return this.http.post(`${this.url}/create`, dto);
+    return this.http.post(`${this.url}/create`, this.toApiDto(dto));
   }
 
   // Note: update sends full object in body — no id in URL
   update(dto: DepartmentDTO): Observable<any> {
-    return this.http.put(`${this.url}/update`, dto);
+    return this.http.put(`${this.url}/update`, this.toApiDto(dto));
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.url}/delete/${id}`);
+  }
+
+  private toApiDto(dto: DepartmentDTO): Record<string, unknown> {
+    return {
+      DepartmentId: dto.departmentId,
+      Name: dto.name,
+      Description: dto.description,
+      CreatedAt: dto.createdAt,
+      EmployeeCount: dto.employeeCount,
+    };
   }
 }

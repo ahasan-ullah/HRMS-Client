@@ -1,111 +1,103 @@
+@use "app/shared/styles/ui" as ui;
+
+@include ui.ui;
+
 .header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 28px 0 40px;
   gap: 12px;
   z-index: 20;
 }
 
-.logo-mark {
-  width: 30px;
-  height: 30px;
-  background: var(--accent);
-  border-radius: 9px;
+.crumb {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  svg { width: 17px; height: 17px; }
-}
-
-.logo-txt {
-  font-family: var(--serif);
-  font-size: 16px;
-  color: var(--text);
-  letter-spacing: -0.3px;
+  gap: 10px;
   margin-right: auto;
-  em { color: var(--accent); font-style: normal; }
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
 }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--border-2);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 7px 14px;
-  color: var(--muted);
-  width: 220px;
-  cursor: text;
-  i { font-size: 15px; }
+.crumb i {
+  color: var(--border);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.crumb strong {
+  color: var(--text);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-left: 8px;
+  gap: 12px;
 }
 
-// Role chip next to avatar
 .role-chip {
   font-size: 11px;
-  font-weight: 500;
-  border-radius: 6px;
-  padding: 3px 9px;
-
-  &.admin    { background: var(--purple-light); color: #5B3A9E; }
-  &.hr       { background: var(--blue-light);   color: #185FA5; }
-  &.employee { background: var(--accent-light);  color: var(--accent-mid); }
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--surface-muted);
+  color: var(--navy);
 }
 
-.ico-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 17px;
-  position: relative;
-  transition: all 0.12s;
-  &:hover { background: var(--border-2); color: var(--text); }
+.role-chip.hr {
+  background: var(--blue-light);
+  color: #275fa6;
 }
 
-.notif-dot {
-  width: 7px;
-  height: 7px;
-  background: var(--danger);
-  border-radius: 50%;
-  border: 2px solid var(--surface);
-  position: absolute;
-  top: 5px;
-  right: 5px;
+.role-chip.employee {
+  background: var(--success-light);
+  color: var(--accent-mid);
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--blue);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  letter-spacing: 0.5px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: default;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
+}
 
-  // Color changes by role via NgClass
-  &.avatar-admin    { background: var(--purple); }
-  &.avatar-hr       { background: var(--blue); }
-  &.avatar-employee { background: var(--accent); }
+.avatar-admin {
+  background: var(--blue);
+}
+
+.avatar-hr {
+  background: #315f9f;
+}
+
+.avatar-employee {
+  background: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 0 18px;
+  }
+
+  .crumb span {
+    display: none;
+  }
 }

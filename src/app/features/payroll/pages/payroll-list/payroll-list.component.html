@@ -1,1 +1,216 @@
-<p>payroll-list works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Payroll</h1>
+      <span class="sub">Monthly payroll management</span>
+    </div>
+    <button class="btn-primary" (click)="showGenerateModal = true">
+      <i class="ti ti-bolt"></i> Generate Payroll
+    </button>
+  </div>
+
+  <div class="two-col">
+    <!-- Payroll list -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Payroll Batches</span>
+      </div>
+      <div class="loading-row" *ngIf="loading">
+        <i class="ti ti-loader-2 spin"></i> Loading…
+      </div>
+
+      <div
+        class="payroll-row"
+        *ngFor="let p of payrolls"
+        [ngClass]="{ selected: selected?.payrollId === p.payrollId }"
+        (click)="selectPayroll(p)"
+      >
+        <div class="pr-ico">
+          <span class="mo">{{ getMonthName(p.payrollMonth).slice(0, 3) }}</span>
+          <span class="yr">{{ p.payrollYear }}</span>
+        </div>
+
+        <div class="pr-info">
+          <div class="pr-name">
+            {{ getMonthName(p.payrollMonth) }} {{ p.payrollYear }}
+          </div>
+          <div class="pr-sub">৳{{ p.totalAmount | number: "1.0-0" }}</div>
+        </div>
+
+        <div class="pr-right">
+          <span class="pill" [ngClass]="getStatusClass(p.status)">{{
+            p.status
+          }}</span>
+        </div>
+      </div>
+
+      <div class="empty-row" *ngIf="!loading && payrolls.length === 0">
+        No payrolls generated yet
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <!-- Actions -->
+      <div class="card" style="padding: 18px" *ngIf="selected">
+        <div
+          style="
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 12px;
+          "
+        >
+          Actions — {{ getMonthName(selected.payrollMonth) }}
+          {{ selected.payrollYear }}
+        </div>
+
+        <div class="s-row">
+          <span class="s-lbl">Total Amount</span>
+          <span class="s-val" style="color: var(--accent)"
+            >৳{{ selected.totalAmount | number: "1.0-0" }}</span
+          >
+        </div>
+        <div class="s-row">
+          <span class="s-lbl">Status</span>
+          <span class="pill" [ngClass]="getStatusClass(selected.status)">{{
+            selected.status
+          }}</span>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 14px;
+          "
+        >
+          <button
+            class="btn-primary"
+            *ngIf="selected.status === 'Draft' && isAdmin"
+            (click)="approve(selected.payrollId)"
+            style="justify-content: center"
+          >
+            <i class="ti ti-check"></i> Approve Payroll
+          </button>
+          <button
+            class="btn-ghost"
+            *ngIf="selected.status === 'Approved' && isAdmin"
+            (click)="markPaid(selected.payrollId)"
+            style="justify-content: center"
+          >
+            <i class="ti ti-credit-card"></i> Mark as Paid
+          </button>
+          <button
+            class="btn-danger"
+            *ngIf="selected.status === 'Draft'"
+            (click)="delete(selected.payrollId)"
+            style="justify-content: center"
+          >
+            <i class="ti ti-trash"></i> Delete Draft
+          </button>
+        </div>
+      </div>
+
+      <!-- No selection -->
+      <div
+        class="card"
+        style="padding: 24px; text-align: center; color: var(--muted)"
+        *ngIf="!selected"
+      >
+        <i
+          class="ti ti-mouse-2"
+          style="font-size: 28px; display: block; margin-bottom: 8px"
+        ></i>
+        Click a payroll to view details
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail table -->
+  <div class="card" *ngIf="selected">
+    <div class="card-head">
+      <span class="card-title">
+        Employee Breakdown — {{ getMonthName(selected.payrollMonth) }}
+        {{ selected.payrollYear }}
+      </span>
+    </div>
+    <div class="loading-row" *ngIf="detailLoading">
+      <i class="ti ti-loader-2 spin"></i> Loading details…
+    </div>
+    <table class="tbl" *ngIf="!detailLoading">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Basic</th>
+          <th>Allowances</th>
+          <th>Bonus</th>
+          <th>Deductions</th>
+          <th>Tax</th>
+          <th>Net Salary</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of details">
+          <td class="emp-name">EMP #{{ d.employeeId }}</td>
+          <td>৳{{ d.basicSalary | number: "1.0-0" }}</td>
+          <td class="td-muted">৳{{ d.totalAllowances | number: "1.0-0" }}</td>
+          <td style="color: var(--accent)">
+            ৳{{ d.bonusAmount | number: "1.0-0" }}
+          </td>
+          <td style="color: var(--danger)">
+            ৳{{ d.totalDeductions | number: "1.0-0" }}
+          </td>
+          <td class="td-muted">৳{{ d.taxAmount | number: "1.0-0" }}</td>
+          <td style="font-weight: 500">৳{{ d.netSalary | number: "1.0-0" }}</td>
+          <td>
+            <span class="pill" [ngClass]="getPaymentClass(d.paymentStatus)">
+              {{ d.paymentStatus }}
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="details.length === 0">
+          <td colspan="8" class="empty-row">No details found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Generate Modal -->
+<div class="modal-overlay" *ngIf="showGenerateModal">
+  <div class="modal" style="width: 400px">
+    <div class="modal-head">
+      <h2>Generate Payroll</h2>
+      <button class="ico-btn" (click)="showGenerateModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid" style="grid-template-columns: 1fr 1fr">
+      <div class="form-group">
+        <label class="f-label">Month</label>
+        <select class="f-select" [(ngModel)]="generateDto.month">
+          <option *ngFor="let m of months" [value]="m.v">{{ m.l }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="f-label">Year</label>
+        <input class="f-input" type="number" [(ngModel)]="generateDto.year" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showGenerateModal = false">
+        Cancel
+      </button>
+      <button class="btn-primary" (click)="generate()" [disabled]="saving">
+        <i class="ti ti-loader-2 spin" *ngIf="saving"></i>
+        <i class="ti ti-bolt" *ngIf="!saving"></i>
+        {{ saving ? "Generating…" : "Generate" }}
+      </button>
+    </div>
+  </div>
+</div>

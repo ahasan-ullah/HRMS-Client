@@ -30,7 +30,11 @@ export class PayrollService {
 
   // Note: generate sends body GeneratePayrollDTO (not query params)
   generate(dto: GeneratePayrollDTO): Observable<any> {
-    return this.http.post(`${this.url}/generate`, dto);
+    return this.http.post(`${this.url}/generate`, {
+      Month: dto.month,
+      Year: dto.year,
+      GeneratedBy: dto.generatedBy,
+    });
   }
 
   approve(id: number): Observable<any> {

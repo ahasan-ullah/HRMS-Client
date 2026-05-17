@@ -35,15 +35,28 @@ export class DeductionService {
   }
 
   create(dto: DeductionDTO): Observable<any> {
-    return this.http.post(`${this.url}/create`, dto);
+    return this.http.post(`${this.url}/create`, this.toApiDto(dto));
   }
 
   // Note: update sends full object in body — no id in URL
   update(dto: DeductionDTO): Observable<any> {
-    return this.http.put(`${this.url}/update`, dto);
+    return this.http.put(`${this.url}/update`, this.toApiDto(dto));
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.url}/delete/${id}`);
+  }
+
+  private toApiDto(dto: DeductionDTO): Record<string, unknown> {
+    return {
+      DeductionId: dto.deductionId,
+      EmployeeId: dto.employeeId,
+      DeductionType: dto.deductionType,
+      Amount: dto.amount,
+      Month: dto.month,
+      Year: dto.year,
+      Reason: dto.reason,
+      CreatedAt: dto.createdAt,
+    };
   }
 }

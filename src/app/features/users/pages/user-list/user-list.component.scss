@@ -1,0 +1,61 @@
+@use "app/shared/styles/ui" as ui;
+
+@include ui.ui;
+
+.role-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.role-guide-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role-desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.role-warning {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--danger);
+  background: var(--danger-light);
+  border: 1px solid #ffd6c8;
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 13px;
+}
+
+.loading-row,
+.empty-row {
+  padding: 18px;
+  color: var(--muted);
+}
+
+.loading-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-row {
+  text-align: center;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

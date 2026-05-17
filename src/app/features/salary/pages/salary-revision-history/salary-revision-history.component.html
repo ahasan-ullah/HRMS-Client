@@ -1,1 +1,126 @@
 <p>salary-revision-history works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Revision History</h1>
+      <span class="sub">Salary change log</span>
+    </div>
+  </div>
+
+  <!-- Employee selector -->
+  <div class="filter-bar">
+    <select
+      class="f-select"
+      [(ngModel)]="selectedEmployeeId"
+      (ngModelChange)="loadRevisions()"
+    >
+      <option [value]="0" disabled>Select an employee…</option>
+      <option *ngFor="let e of employees" [value]="e.employeeId">
+        {{ e.firstName }} {{ e.lastName }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Prompt -->
+  <div class="empty-prompt" *ngIf="!selectedEmployeeId">
+    <i class="ti ti-history"></i>
+    <p>Select an employee to view their salary revision history</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="loading">
+    <i class="ti ti-loader-2 spin"></i> Loading…
+  </div>
+
+  <!-- Revisions -->
+  <div class="two-col" *ngIf="selectedEmployeeId && !loading">
+    <!-- Timeline -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">
+          Revisions for {{ getEmployeeName(selectedEmployeeId) }}
+        </span>
+        <span style="font-size: 12px; color: var(--muted)">
+          {{ revisions.length }} revision(s)
+        </span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item" *ngFor="let rev of revisions; let first = first">
+          <div class="tl-dot" [ngClass]="{ recent: first }"></div>
+          <div class="tl-content">
+            <div class="tl-title">
+              {{ first ? "Latest Revision" : "Salary Change" }}
+            </div>
+            <div class="tl-sub">
+              Reason: {{ rev.reason || "No reason provided" }}
+            </div>
+            <div class="tl-amounts">
+              <span class="old-sal"
+                >৳{{ rev.oldSalary | number: "1.0-0" }}</span
+              >
+              <i
+                class="ti ti-arrow-right"
+                style="color: var(--muted); font-size: 12px"
+              ></i>
+              <span class="new-sal"
+                >৳{{ rev.newSalary | number: "1.0-0" }}</span
+              >
+              <span
+                class="pct-badge"
+                [ngClass]="getDifference(rev) >= 0 ? 'up' : 'down'"
+              >
+                {{ getPercentChange(rev) }}
+              </span>
+            </div>
+          </div>
+          <div class="tl-date">
+            {{ rev.createdAt | date: "dd MMM yyyy" }}
+          </div>
+        </div>
+
+        <div class="empty-row" *ngIf="revisions.length === 0">
+          No revision history for this employee
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card" style="padding: 18px">
+      <div
+        style="
+          font-size: 12px;
+          font-weight: 500;
+          margin-bottom: 14px;
+          color: var(--muted);
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+        "
+      >
+        Summary
+      </div>
+      <div class="s-row">
+        <span class="s-lbl">Total Revisions</span>
+        <span class="s-val">{{ revisions.length }}</span>
+      </div>
+      <div class="s-row" *ngIf="revisions.length > 0">
+        <span class="s-lbl">Current Salary</span>
+        <span class="s-val" style="color: var(--accent)">
+          ৳{{ revisions[0].newSalary | number: "1.0-0" }}
+        </span>
+      </div>
+      <div class="s-row" *ngIf="revisions.length > 0">
+        <span class="s-lbl">Starting Salary</span>
+        <span class="s-val">
+          ৳{{ revisions[revisions.length - 1].oldSalary | number: "1.0-0" }}
+        </span>
+      </div>
+      <div class="s-row" *ngIf="revisions.length > 0">
+        <span class="s-lbl">Last Revised</span>
+        <span class="s-val">{{
+          revisions[0].createdAt | date: "dd MMM yyyy"
+        }}</span>
+      </div>
+    </div>
+  </div>
+</div>

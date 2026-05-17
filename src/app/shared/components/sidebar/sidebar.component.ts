@@ -52,4 +52,11 @@ export class SidebarComponent {
     if (!item.roles || item.roles.length === 0) return true;
     return item.roles.includes(this.role);
   }
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => this.authService.clearSession(),
+      error: () => this.authService.clearSession()
+    });
+  }
 }

@@ -1,1 +1,298 @@
-<p>dashboard works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>{{ isEmployeeDashboard() ? "Employee Dashboard" : "Dashboard" }}</h1>
+      <span class="sub">Welcome back, {{ username }}</span>
+    </div>
+    <div class="btn-row" *ngIf="!isEmployeeDashboard()">
+      <a routerLink="/employees/create" class="btn-primary">
+        <i class="ti ti-plus"></i> Add Employee
+      </a>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <i class="ti ti-loader-2 spin"></i> Loading dashboard...
+  </div>
+
+  <ng-container *ngIf="!loading && !isEmployeeDashboard()">
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">
+          Total Employees
+          <i class="ti ti-users"></i>
+        </div>
+        <div class="metric-value">{{ totalEmployees }}</div>
+        <div class="metric-note">{{ activeEmployees }} active employees</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">
+          Latest Payroll
+          <i class="ti ti-wallet"></i>
+        </div>
+        <div class="metric-value" *ngIf="latestPayroll">
+          ৳{{ latestPayroll.totalAmount | number: "1.0-0" }}
+        </div>
+        <div class="metric-value" *ngIf="!latestPayroll">—</div>
+        <div class="metric-note" *ngIf="latestPayroll">
+          {{ getMonthName(latestPayroll.payrollMonth) }}
+          {{ latestPayroll.payrollYear }}
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">
+          Departments
+          <i class="ti ti-building"></i>
+        </div>
+        <div class="metric-value">{{ totalDepartments }}</div>
+        <div class="metric-note">Current organization</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">
+          Paid Payrolls
+          <i class="ti ti-circle-check"></i>
+        </div>
+        <div class="metric-value">{{ paidPayrolls }}</div>
+        <div class="metric-note up">{{ payrolls.length }} generated all time</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Recent Employees</span>
+          <a routerLink="/employees" class="link">View all ↗</a>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Position</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of recentEmployees; let i = index">
+              <td>
+                <div class="emp-cell">
+                  <div class="av" [style.background]="getAvatarColor(i)">
+                    {{ getInitials(emp.firstName, emp.lastName) }}
+                  </div>
+                  <div>
+                    <div class="emp-name">
+                      {{ emp.firstName }} {{ emp.lastName }}
+                    </div>
+                    <div class="emp-sub">{{ emp.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ emp.position }}</td>
+              <td>
+                <span class="pill" [ngClass]="getStatusClass(emp.employmentStatus)">
+                  {{ emp.employmentStatus }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="recentEmployees.length === 0">
+              <td colspan="3" class="empty-row">No employees found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Payroll History</span>
+          <a routerLink="/payroll" class="link">All ↗</a>
+        </div>
+        <div class="payroll-row" *ngFor="let p of payrolls.slice(0, 5)">
+          <div class="pr-ico">
+            <span class="mo">{{ getMonthName(p.payrollMonth).slice(0, 3) }}</span>
+            <span class="yr">{{ p.payrollYear }}</span>
+          </div>
+          <div class="pr-info">
+            <div class="pr-name">
+              {{ getMonthName(p.payrollMonth) }} {{ p.payrollYear }}
+            </div>
+          </div>
+          <div class="pr-right">
+            <div class="pr-amt">৳{{ p.totalAmount | number: "1.0-0" }}</div>
+            <span class="pill" [ngClass]="getPayrollStatusClass(p.status)">
+              {{ p.status }}
+            </span>
+          </div>
+        </div>
+        <div class="empty-row" *ngIf="payrolls.length === 0">No payrolls yet</div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && isEmployeeDashboard()">
+    <div class="employee-hero card pad">
+      <div class="emp-cell">
+        <div class="av hero-av">
+          {{ getInitials(employee?.firstName || "", employee?.lastName || "") }}
+        </div>
+        <div>
+          <h2>{{ employee?.firstName }} {{ employee?.lastName }}</h2>
+          <p>{{ employee?.position || "Employee" }}</p>
+        </div>
+      </div>
+      <span class="pill" [ngClass]="getStatusClass(employee?.employmentStatus || '')">
+        {{ employee?.employmentStatus || "Active" }}
+      </span>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">
+          Department
+          <i class="ti ti-building"></i>
+        </div>
+        <div class="metric-value metric-text">{{ employeeDepartment?.name || "—" }}</div>
+        <div class="metric-note">Assigned team</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">
+          Gross Salary
+          <i class="ti ti-cash"></i>
+        </div>
+        <div class="metric-value">৳{{ (employeeSalary?.grossSalary || 0) | number: "1.0-0" }}</div>
+        <div class="metric-note">Active salary package</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">
+          Bonuses
+          <i class="ti ti-gift"></i>
+        </div>
+        <div class="metric-value">৳{{ totalBonus() | number: "1.0-0" }}</div>
+        <div class="metric-note">{{ employeeBonuses.length }} records</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">
+          Net Pay View
+          <i class="ti ti-report-money"></i>
+        </div>
+        <div class="metric-value">৳{{ netPay() | number: "1.0-0" }}</div>
+        <div class="metric-note">Salary + bonus - deduction</div>
+      </div>
+    </div>
+
+    <div class="two-col employee-grid">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Employee Details</span>
+        </div>
+        <div class="details-list">
+          <div class="s-row">
+            <span class="s-lbl">Employee ID</span>
+            <span class="s-val">#{{ employee?.employeeId || "—" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Email</span>
+            <span class="s-val">{{ employee?.email || "—" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Phone</span>
+            <span class="s-val">{{ employee?.phone || "—" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Joining Date</span>
+            <span class="s-val">{{ employee?.joiningDate | date: "dd MMM yyyy" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Account Number</span>
+            <span class="s-val">{{ employee?.accountNumber || "—" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Address</span>
+            <span class="s-val">{{ employee?.address || "—" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Salary Breakdown</span>
+        </div>
+        <div class="details-list">
+          <div class="s-row">
+            <span class="s-lbl">Basic</span>
+            <span class="s-val">৳{{ (employeeSalary?.basicSalary || 0) | number: "1.0-0" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">House</span>
+            <span class="s-val">৳{{ (employeeSalary?.houseAllowance || 0) | number: "1.0-0" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Medical</span>
+            <span class="s-val">৳{{ (employeeSalary?.medicalAllowance || 0) | number: "1.0-0" }}</span>
+          </div>
+          <div class="s-row">
+            <span class="s-lbl">Transport</span>
+            <span class="s-val">৳{{ (employeeSalary?.transportAllowance || 0) | number: "1.0-0" }}</span>
+          </div>
+          <div class="s-row strong">
+            <span class="s-lbl">Gross</span>
+            <span class="s-val">৳{{ (employeeSalary?.grossSalary || 0) | number: "1.0-0" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col employee-grid">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Bonuses</span>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bonus of employeeBonuses.slice(0, 5)">
+              <td><span class="pill bonus">{{ bonus.bonusType }}</span></td>
+              <td class="amount positive">৳{{ bonus.amount | number: "1.0-0" }}</td>
+              <td>{{ bonus.bonusDate | date: "dd MMM yyyy" }}</td>
+            </tr>
+            <tr *ngIf="employeeBonuses.length === 0">
+              <td colspan="3" class="empty-row">No bonuses recorded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Deductions</span>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Period</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let deduction of employeeDeductions.slice(0, 5)">
+              <td><span class="pill deduction">{{ deduction.deductionType }}</span></td>
+              <td class="amount negative">৳{{ deduction.amount | number: "1.0-0" }}</td>
+              <td>{{ getMonthName(deduction.month) }} {{ deduction.year }}</td>
+            </tr>
+            <tr *ngIf="employeeDeductions.length === 0">
+              <td colspan="3" class="empty-row">No deductions recorded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>

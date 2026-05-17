@@ -1,55 +1,67 @@
 <nav class="sidebar">
+  <a routerLink="/dashboard" class="brand">
+    <span class="brand-mark">H</span>
+    <span class="brand-copy">
+      <strong>HRMS</strong>
+      <small>Workforce OS</small>
+    </span>
+  </a>
 
   <!-- Main -->
+  <div class="nav-section">Overview</div>
   <ng-container *ngFor="let item of mainNav">
-    
+    <a
       *ngIf="canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="nav-item">
       <i [ngClass]="['ti', item.icon]"></i>
-      {{ item.label }}
+      <span>{{ item.label }}</span>
+      <i class="ti ti-chevron-right nav-chev"></i>
     </a>
   </ng-container>
 
   <!-- People -->
   <div class="nav-section">People</div>
   <ng-container *ngFor="let item of peopleNav">
-    
+    <a
       *ngIf="canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       class="nav-item">
       <i [ngClass]="['ti', item.icon]"></i>
-      {{ item.label }}
+      <span>{{ item.label }}</span>
+      <i class="ti ti-chevron-right nav-chev"></i>
     </a>
   </ng-container>
 
   <!-- Compensation -->
   <div class="nav-section">Compensation</div>
   <ng-container *ngFor="let item of compensationNav">
-    
+    <a
       *ngIf="canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="nav-item">
       <i [ngClass]="['ti', item.icon]"></i>
-      {{ item.label }}
+      <span>{{ item.label }}</span>
+      <i class="ti ti-chevron-right nav-chev"></i>
     </a>
   </ng-container>
 
   <!-- Payroll -->
   <div class="nav-section">Payroll</div>
   <ng-container *ngFor="let item of payrollNav">
-    
+    <a
       *ngIf="canSee(item)"
       [routerLink]="item.route"
       routerLinkActive="active"
       class="nav-item">
       <i [ngClass]="['ti', item.icon]"></i>
-      {{ item.label }}
+      <span>{{ item.label }}</span>
+      <i class="ti ti-chevron-right nav-chev"></i>
     </a>
   </ng-container>
 
@@ -57,15 +69,20 @@
   <div class="nav-footer">
     <div class="nav-section" style="margin-top:0">System</div>
     <ng-container *ngFor="let item of systemNav">
-      
+      <a
         *ngIf="canSee(item)"
         [routerLink]="item.route"
         routerLinkActive="active"
         class="nav-item">
         <i [ngClass]="['ti', item.icon]"></i>
-        {{ item.label }}
+        <span>{{ item.label }}</span>
+        <i class="ti ti-chevron-right nav-chev"></i>
       </a>
     </ng-container>
+    <button class="nav-item sign-out" type="button" (click)="logout()">
+      <i class="ti ti-logout"></i>
+      <span>Sign out</span>
+    </button>
   </div>
 
 </nav>

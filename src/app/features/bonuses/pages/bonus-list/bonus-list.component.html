@@ -1,1 +1,135 @@
-<p>bonus-list works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Bonuses</h1>
+      <span class="sub">{{ filtered.length }} records</span>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <i class="ti ti-plus"></i> Add Bonus
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <select
+      class="f-select"
+      [(ngModel)]="filterType"
+      (ngModelChange)="applyFilter()"
+    >
+      <option value="">All Types</option>
+      <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+    </select>
+    <button class="btn-ghost" style="margin-left: auto" (click)="load()">
+      <i class="ti ti-refresh"></i> Refresh
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="loading-row" *ngIf="loading">
+      <i class="ti ti-loader-2 spin"></i> Loading…
+    </div>
+    <table class="tbl" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Reason</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of filtered">
+          <td>
+            <div class="emp-cell">
+              <div class="av" style="background: #071a3d">
+                {{ getEmployeeName(b.employeeId).slice(0, 2).toUpperCase() }}
+              </div>
+              <span class="emp-name">{{ getEmployeeName(b.employeeId) }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="pill" [ngClass]="getTypeClass(b.bonusType)">{{
+              b.bonusType
+            }}</span>
+          </td>
+          <td style="font-weight: 500; color: var(--accent)">
+            ৳{{ b.amount | number: "1.0-0" }}
+          </td>
+          <td class="td-muted">{{ b.bonusDate | date: "dd MMM yyyy" }}</td>
+          <td class="td-muted">{{ b.reason || "—" }}</td>
+          <td>
+            <div class="action-row">
+              <button class="ico-btn" (click)="openEdit(b)">
+                <i class="ti ti-edit"></i>
+              </button>
+              <button class="ico-btn danger" (click)="delete(b.bonusId)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filtered.length === 0">
+          <td colspan="6" class="empty-row">No bonuses found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>{{ isEdit ? "Edit Bonus" : "Add Bonus" }}</h2>
+      <button class="ico-btn" (click)="showModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="f-label">Employee *</label>
+        <select class="f-select" [(ngModel)]="dto.employeeId">
+          <option [value]="0" disabled>Select employee…</option>
+          <option *ngFor="let e of employees" [value]="e.employeeId">
+            {{ e.firstName }} {{ e.lastName }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="f-label">Bonus Type</label>
+        <select class="f-select" [(ngModel)]="dto.bonusType">
+          <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="f-label">Amount *</label>
+        <input
+          class="f-input"
+          type="number"
+          [(ngModel)]="dto.amount"
+          placeholder="0"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Bonus Date</label>
+        <input class="f-input" type="date" [(ngModel)]="dto.bonusDate" />
+      </div>
+      <div class="form-group full">
+        <label class="f-label">Reason</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.reason"
+          placeholder="Optional"
+        />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showModal = false">Cancel</button>
+      <button class="btn-primary" (click)="save()" [disabled]="saving">
+        <i class="ti ti-check"></i>
+        {{ saving ? "Saving…" : isEdit ? "Update" : "Add" }}
+      </button>
+    </div>
+  </div>
+</div>

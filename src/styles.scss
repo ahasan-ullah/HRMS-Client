@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+@import "@tabler/icons-webfont/dist/tabler-icons.min.css";
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: #f6f8fb;
+  color: #020817;
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

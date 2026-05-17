@@ -1,1 +1,113 @@
-<p>employee-form works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>{{ isEdit ? "Edit Employee" : "Add Employee" }}</h1>
+    </div>
+    <div class="btn-row">
+      <a routerLink="/employees" class="btn-ghost">
+        <i class="ti ti-arrow-left"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 24px" *ngIf="!loading">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="f-label">First Name *</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.firstName"
+          placeholder="First name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Last Name *</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.lastName"
+          placeholder="Last name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Email *</label>
+        <input
+          class="f-input"
+          type="email"
+          [(ngModel)]="dto.email"
+          placeholder="email@example.com"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Phone</label>
+        <input class="f-input" [(ngModel)]="dto.phone" placeholder="+880..." />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Position *</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.position"
+          placeholder="e.g. Sr. Developer"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Department *</label>
+        <select class="f-select" [(ngModel)]="dto.departmentId">
+          <option [value]="0" disabled>Select department…</option>
+          <option *ngFor="let d of departments" [value]="d.departmentId">
+            {{ d.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Account Number</label>
+        <input
+          class="f-input"
+          [(ngModel)]="dto.accountNumber"
+          placeholder="Bank account number"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Employment Status</label>
+        <select class="f-select" [(ngModel)]="dto.employmentStatus">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="f-label">Joining Date</label>
+        <input class="f-input" type="date" [(ngModel)]="dto.joiningDate" />
+      </div>
+
+      <div class="form-group full">
+        <label class="f-label">Address</label>
+        <textarea
+          class="f-textarea"
+          [(ngModel)]="dto.address"
+          placeholder="Full address"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <a routerLink="/employees" class="btn-ghost">Cancel</a>
+      <button class="btn-primary" (click)="save()" [disabled]="saving">
+        <i class="ti ti-loader-2 spin" *ngIf="saving"></i>
+        <i class="ti ti-check" *ngIf="!saving"></i>
+        {{
+          saving ? "Saving…" : isEdit ? "Update Employee" : "Create Employee"
+        }}
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <i class="ti ti-loader-2 spin"></i> Loading…
+  </div>
+</div>

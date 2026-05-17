@@ -1,1 +1,246 @@
-<p>user-list works!</p>
+<div class="page-wrap">
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Auth & Users</h1>
+      <span class="sub">Role management</span>
+    </div>
+    <button class="btn-ghost" (click)="openChangePassword()">
+      <i class="ti ti-key"></i> Change My Password
+    </button>
+  </div>
+
+  <!-- Current session info -->
+  <div class="card" style="padding: 18px">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 14px;
+      "
+    >
+      Current Session
+    </div>
+    <div class="s-row">
+      <span class="s-lbl">Logged in as</span>
+      <span class="s-val">{{ getCurrentUsername() }}</span>
+    </div>
+    <div class="s-row">
+      <span class="s-lbl">Role</span>
+      <span class="role-badge" [ngClass]="getRoleClass(getCurrentRole())">
+        {{ getCurrentRole() }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Role assignment info -->
+  <div class="card" style="padding: 24px">
+    <div style="font-size: 15px; font-weight: 500; margin-bottom: 8px">
+      Role Assignment
+    </div>
+    <p style="color: var(--muted); font-size: 13px; margin-bottom: 16px">
+      As Admin, you can assign roles to user accounts. Employee ID is not used
+      for role assignment, and you cannot change your own role.
+    </p>
+
+    <div
+      class="form-grid"
+      style="
+        grid-template-columns: 1.4fr 1fr 1fr auto;
+        gap: 12px;
+        align-items: flex-end;
+      "
+    >
+      <div class="form-group">
+        <label class="f-label">User</label>
+        <select
+          class="f-select"
+          [(ngModel)]="assignDto.userId"
+          (ngModelChange)="onUserSelected($event)"
+        >
+          <option [ngValue]="0" disabled>Select user...</option>
+          <option *ngFor="let user of users" [ngValue]="user.userId">
+            #{{ user.userId }} - {{ user.username }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="f-label">Current Role</label>
+        <input
+          class="f-input"
+          [value]="selectedUser?.role || 'Select user'"
+          disabled
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Status</label>
+        <input
+          class="f-input"
+          [value]="selectedUser ? (selectedUser.isActive ? 'Active' : 'Inactive') : 'Select user'"
+          disabled
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">New Role</label>
+        <select class="f-select" [(ngModel)]="assignDto.role">
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+      <button
+        class="btn-primary"
+        (click)="assignRole()"
+        [disabled]="saving || isCurrentUserTarget()"
+      >
+        <i class="ti ti-check"></i> Assign
+      </button>
+    </div>
+
+    <div class="role-warning" *ngIf="isCurrentUserTarget()">
+      <i class="ti ti-alert-circle"></i>
+      You cannot change the role of the account you are currently using.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Users</span>
+      <button class="btn-ghost" (click)="loadUsers()" [disabled]="loading">
+        <i class="ti ti-refresh"></i> Refresh
+      </button>
+    </div>
+
+    <div class="loading-row" *ngIf="loading">
+      <i class="ti ti-loader-2 spin"></i> Loading users...
+    </div>
+
+    <table class="tbl" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Username</th>
+          <th>Current Role</th>
+          <th>Status</th>
+          <th>Last Login</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>#{{ user.userId }}</td>
+          <td class="emp-name">{{ user.username }}</td>
+          <td>
+            <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+              {{ user.role }}
+            </span>
+          </td>
+          <td>
+            <span class="pill" [ngClass]="user.isActive ? 'active' : 'inactive'">
+              {{ user.isActive ? "Active" : "Inactive" }}
+            </span>
+          </td>
+          <td class="td-muted">
+            {{ user.lastLogin ? (user.lastLogin | date: "dd MMM yyyy") : "Never" }}
+          </td>
+          <td>
+            <button
+              class="btn-ghost"
+              (click)="toggleActive(user)"
+              [disabled]="saving || isCurrentUser(user.userId)"
+            >
+              {{ user.isActive ? "Deactivate" : "Activate" }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0">
+          <td colspan="6" class="empty-row">No users found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Role guide -->
+  <div class="card" style="padding: 20px">
+    <div
+      style="
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 14px;
+      "
+    >
+      Role Permissions
+    </div>
+    <div class="role-guide">
+      <div class="role-guide-item">
+        <span class="role-badge admin">Admin</span>
+        <span class="role-desc"
+          >Full access — manage everything including user roles</span
+        >
+      </div>
+      <div class="role-guide-item">
+        <span class="role-badge hr">HR</span>
+        <span class="role-desc"
+          >Manage employees, salary, deductions, bonuses, payroll</span
+        >
+      </div>
+      <div class="role-guide-item">
+        <span class="role-badge employee">Employee</span>
+        <span class="role-desc">View own data only</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" *ngIf="showPasswordModal">
+  <div class="modal" style="width: 400px">
+    <div class="modal-head">
+      <h2>Change Password</h2>
+      <button class="ico-btn" (click)="showPasswordModal = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-grid" style="grid-template-columns: 1fr">
+      <div class="form-group">
+        <label class="f-label">Current Password</label>
+        <input
+          class="f-input"
+          type="password"
+          [(ngModel)]="changePasswordDto.currentPassword"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">New Password</label>
+        <input
+          class="f-input"
+          type="password"
+          [(ngModel)]="changePasswordDto.newPassword"
+        />
+      </div>
+      <div class="form-group">
+        <label class="f-label">Confirm New Password</label>
+        <input
+          class="f-input"
+          type="password"
+          [(ngModel)]="changePasswordDto.confirmPassword"
+        />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showPasswordModal = false">
+        Cancel
+      </button>
+      <button
+        class="btn-primary"
+        (click)="changePassword()"
+        [disabled]="saving"
+      >
+        <i class="ti ti-key"></i> {{ saving ? "Saving…" : "Change Password" }}
+      </button>
+    </div>
+  </div>
+</div>

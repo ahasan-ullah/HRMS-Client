@@ -1,1 +1,131 @@
-<p>employee-list works!</p>
+<div class="page-wrap">
+  <!-- Page top -->
+  <div class="page-top">
+    <div class="page-title">
+      <h1>Employees</h1>
+      <span class="sub">{{ filtered.length }} records</span>
+    </div>
+    <div class="btn-row">
+      <a routerLink="/employees/create" class="btn-primary">
+        <i class="ti ti-plus"></i> Add Employee
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input
+      class="f-search"
+      placeholder="Search by name, email, position…"
+      [(ngModel)]="keyword"
+      (ngModelChange)="onSearch()"
+    />
+
+    <select
+      class="f-select"
+      [(ngModel)]="selectedDept"
+      (ngModelChange)="onDeptChange()"
+    >
+      <option [ngValue]="0">All Departments</option>
+      <option *ngFor="let d of departments" [ngValue]="d.departmentId">
+        {{ d.name }}
+      </option>
+    </select>
+
+    <button
+      class="btn-ghost"
+      style="margin-left: auto"
+      (click)="loadEmployees()"
+    >
+      <i class="ti ti-refresh"></i> Refresh
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div *ngIf="loading" class="loading-row">
+      <i class="ti ti-loader-2 spin"></i> Loading employees…
+    </div>
+
+    <table class="tbl" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Position</th>
+          <th>Account No.</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of filtered; let i = index">
+          <td>
+            <div class="emp-cell">
+              <div class="av" [style.background]="getAvatarColor(i)">
+                {{ getInitials(emp.firstName, emp.lastName) }}
+              </div>
+              <div>
+                <div class="emp-name">
+                  {{ emp.firstName }} {{ emp.lastName }}
+                </div>
+                <div class="emp-sub">{{ emp.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="td-muted">{{ emp.position }}</td>
+          <td class="td-muted">{{ emp.accountNumber }}</td>
+          <td class="td-muted">{{ emp.joiningDate | date: "dd MMM yyyy" }}</td>
+          <td>
+            <span class="pill" [ngClass]="getStatusClass(emp.employmentStatus)">
+              {{ emp.employmentStatus }}
+            </span>
+          </td>
+          <td>
+            <div class="action-row">
+              <a
+                [routerLink]="['/employees/edit', emp.employeeId]"
+                class="ico-btn"
+                title="Edit"
+              >
+                <i class="ti ti-edit"></i>
+              </a>
+              <button
+                class="ico-btn danger"
+                title="Delete"
+                (click)="confirmDelete(emp.employeeId)"
+              >
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filtered.length === 0">
+          <td colspan="6" class="empty-row">No employees found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal">
+  <div class="modal" style="width: 400px">
+    <div class="modal-head">
+      <h2>Delete Employee</h2>
+      <button class="ico-btn" (click)="cancelDelete()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <p style="color: var(--muted); font-size: 13px">
+      Are you sure you want to delete this employee? This action will mark them
+      as terminated.
+    </p>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="deleteEmployee()">
+        <i class="ti ti-trash"></i> Delete
+      </button>
+    </div>
+  </div>
+</div>
