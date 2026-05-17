@@ -1,27 +1,139 @@
-# HrmsClient
+# HRMS Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+> A modern Angular frontend for managing people, payroll, compensation, and role-based access in one place.
 
-## Development server
+## Overview
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+HRMS Client is the frontend for an HR management system built with Angular 17. It provides a clean dashboard experience for Admin, HR, and Employee roles, with routed modules for employees, departments, salary, payroll, bonuses, deductions, users, and authentication.
 
-## Code scaffolding
+The app is designed as a standalone Angular frontend with HTTP interceptors, route guards, lazy-loaded feature areas, and a shared layout shell.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Key Features
 
-## Build
+- Role-based dashboard views for Admin, HR, and Employee users.
+- Employee, department, salary, bonus, deduction, payroll, and user management screens.
+- Protected routes with auth and role guards.
+- Centralized HTTP handling with token attachment and API response casing normalization.
+- Shared application shell with header, sidebar, layout, and toast notifications.
+- Proxy-based local development setup for backend API integration.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Tech Stack
 
-## Running unit tests
+- Angular 17
+- TypeScript
+- RxJS
+- Angular Router
+- Angular Forms
+- Jasmine and Karma
+- Tabler Icons
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Project Structure
 
-## Running end-to-end tests
+```text
+src/
+	app/
+		core/
+			guards/
+			interceptors/
+			models/
+			services/
+		features/
+			auth/
+			dashboard/
+			employees/
+			departments/
+			salary/
+			payroll/
+			bonuses/
+			deductions/
+			users/
+		shared/
+			components/
+			services/
+			styles/
+	assets/
+	environments/
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Getting Started
 
-## Further help
+### Prerequisites
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Node.js 18 or newer
+- npm
+- Angular CLI 17
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run the App
+
+```bash
+npm start
+```
+
+The app runs at `http://localhost:4200/` and uses `proxy.conf.json` for backend API calls.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Run Tests
+
+```bash
+npm test
+```
+
+## Available Scripts
+
+| Script | Description |
+| --- | --- |
+| `npm start` | Starts the development server with the API proxy enabled. |
+| `npm run build` | Builds the app into `dist/`. |
+| `npm run watch` | Rebuilds on file changes in development mode. |
+| `npm test` | Runs the unit test suite. |
+
+## Architecture Notes
+
+- Authentication state is stored locally and used by guards, interceptors, and layout UI.
+- The app uses lazy-loaded feature routes to keep the initial bundle focused.
+- API responses are normalized to camelCase on the client so feature components can bind consistently.
+- The shared layout renders the main shell while feature modules handle their own page content.
+
+## Environment
+
+Environment-specific API URLs are configured in:
+
+- `src/environments/environment.ts`
+- `src/environments/environment.production.ts`
+
+## Backend Integration
+
+This frontend expects a backend that exposes endpoints for:
+
+- authentication
+- users
+- employees
+- departments
+- salary
+- payroll
+- bonuses
+- deductions
+- dashboard
+
+If the backend contract changes, update the matching service and model files in `src/app/core/`.
+
+## Notes
+
+- Login and dashboard flows rely on role-aware session data.
+- Admin and HR users can access management features.
+- Employees see their own dashboard data only.
+
+## Further Help
+
+Use `npm run ng -- help` or the [Angular CLI documentation](https://angular.dev/tools/cli) for additional commands and generation options.
