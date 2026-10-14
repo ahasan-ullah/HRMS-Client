@@ -1,139 +1,210 @@
-# HRMS Client
+<div align="center">
 
-> A modern Angular frontend for managing people, payroll, compensation, and role-based access in one place.
+<img src=".github/assets/banner.svg" alt="HRMS Client — people, payroll and permissions in one place" width="100%"/>
 
-## Overview
+<br/>
 
-HRMS Client is the frontend for an HR management system built with Angular 17. It provides a clean dashboard experience for Admin, HR, and Employee roles, with routed modules for employees, departments, salary, payroll, bonuses, deductions, users, and authentication.
+<a href="https://angular.dev"><img src="https://img.shields.io/badge/Angular-17-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 17"/></a>
+<a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.4"/></a>
+<a href="https://rxjs.dev"><img src="https://img.shields.io/badge/RxJS-7.8-B7178C?style=for-the-badge&logo=reactivex&logoColor=white" alt="RxJS 7.8"/></a>
+<a href="https://tabler.io/icons"><img src="https://img.shields.io/badge/Tabler_Icons-3-0f766e?style=for-the-badge&logo=tabler&logoColor=white" alt="Tabler Icons"/></a>
+<img src="https://img.shields.io/badge/Auth-JWT-071a3d?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT auth"/>
 
-The app is designed as a standalone Angular frontend with HTTP interceptors, route guards, lazy-loaded feature areas, and a shared layout shell.
+<p>
+  <a href="#-quick-start"><b>Quick start</b></a> ·
+  <a href="#-features"><b>Features</b></a> ·
+  <a href="#-who-sees-what"><b>Roles</b></a> ·
+  <a href="#-how-a-request-travels"><b>Architecture</b></a> ·
+  <a href="#-project-structure"><b>Structure</b></a>
+</p>
 
-## Key Features
+</div>
 
-- Role-based dashboard views for Admin, HR, and Employee users.
-- Employee, department, salary, bonus, deduction, payroll, and user management screens.
-- Protected routes with auth and role guards.
-- Centralized HTTP handling with token attachment and API response casing normalization.
-- Shared application shell with header, sidebar, layout, and toast notifications.
-- Proxy-based local development setup for backend API integration.
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
 
-## Tech Stack
+## ✨ Overview
 
-- Angular 17
-- TypeScript
-- RxJS
-- Angular Router
-- Angular Forms
-- Jasmine and Karma
-- Tabler Icons
+**HRMS Client** is the Angular 17 frontend for an HR management system. It gives **Admins**, **HR staff**, and **Employees** a single, role‑aware dashboard for people, departments, compensation, and payroll — with lazy‑loaded feature areas, guarded routes, and a shared layout shell that keeps everything consistent.
 
-## Project Structure
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
 
-```text
-src/
-	app/
-		core/
-			guards/
-			interceptors/
-			models/
-			services/
-		features/
-			auth/
-			dashboard/
-			employees/
-			departments/
-			salary/
-			payroll/
-			bonuses/
-			deductions/
-			users/
-		shared/
-			components/
-			services/
-			styles/
-	assets/
-	environments/
-```
+## 🚀 Features
 
-## Getting Started
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>👥 People</h3>
+      Employee directory with create / edit forms and department management.
+    </td>
+    <td width="33%" valign="top">
+      <h3>💰 Compensation</h3>
+      Salary records, full <b>revision history</b>, bonuses, and deductions.
+    </td>
+    <td width="33%" valign="top">
+      <h3>🧾 Payroll</h3>
+      Payroll runs built from salary, bonus, and deduction data.
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>🔐 Access control</h3>
+      <code>authGuard</code> + <code>roleGuard</code> on every protected route, and a sidebar that only shows what you can open.
+    </td>
+    <td width="33%" valign="top">
+      <h3>🔄 Silent refresh</h3>
+      JWTs attach automatically; a <code>401</code> triggers one refresh‑token retry before logging out.
+    </td>
+    <td width="33%" valign="top">
+      <h3>🧩 Shared shell</h3>
+      Header, sidebar, layout, and toast notifications reused across every feature.
+    </td>
+  </tr>
+</table>
 
-### Prerequisites
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
 
-- Node.js 18 or newer
-- npm
-- Angular CLI 17
+## 🔑 Who sees what
 
-### Install Dependencies
+| Area | Route | 👑 Admin | 🧑‍💼 HR | 👤 Employee |
+| :-- | :-- | :-: | :-: | :-: |
+| Dashboard | `/dashboard` | ✅ | ✅ | ✅ *(own data)* |
+| Employees | `/employees` | ✅ | ✅ | — |
+| Departments | `/departments` | ✅ | ✅ | — |
+| Salary & revisions | `/salary`, `/salary/revisions` | ✅ | ✅ | — |
+| Deductions | `/deductions` | ✅ | ✅ | — |
+| Bonuses | `/bonuses` | ✅ | ✅ | — |
+| Payroll | `/payroll` | ✅ | ✅ | — |
+| Auth & Users | `/users` | ✅ | — | — |
+
+> [!TIP]
+> Role rules live in two places: `data.roles` in [`app.routes.ts`](src/app/app.routes.ts) and the nav items in [`sidebar.component.ts`](src/app/shared/components/sidebar/sidebar.component.ts). Change both together.
+
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
+
+## 🔁 How a request travels
+
+<img src=".github/assets/request-flow.svg" alt="Request flow diagram" width="100%"/>
+
+- **`authInterceptor`** attaches `Authorization: Bearer <token>` (skipping `/auth/login` and `/auth/refresh`). On a `401` it tries the refresh token once, retries the original request, and clears the session if that fails.
+- **`apiCaseInterceptor`** converts every response body's keys to camelCase, so templates bind to `employee.firstName` even when the API returns `FirstName`.
+- **Session state** (`accessToken`, `refreshToken`, `role`, `userId`, `username`) is kept in `localStorage` and read by guards, interceptors, and the layout.
+
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
+
+## ⚡ Quick start
+
+<p>
+  <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=nodejs,npm,angular,ts,sass,vscode" alt="Toolchain"/></a>
+</p>
+
+**Prerequisites:** Node.js 18+, npm, and the HRMS API running at `https://localhost:44368`.
 
 ```bash
+# 1 · clone
+git clone https://github.com/ahasan-ullah/HRMS-Client.git
+cd HRMS-Client
+
+# 2 · install
 npm install
-```
 
-### Run the App
-
-```bash
+# 3 · run (proxies /api → https://localhost:44368)
 npm start
 ```
 
-The app runs at `http://localhost:4200/` and uses `proxy.conf.json` for backend API calls.
+Then open **http://localhost:4200** and sign in. 🎉
 
-### Build for Production
+> [!NOTE]
+> The backend URL lives in [`proxy.conf.json`](proxy.conf.json). Point `target` somewhere else if your API runs on a different host or port.
 
-```bash
-npm run build
+### 📜 Scripts
+
+| Command | What it does |
+| :-- | :-- |
+| `npm start` | Dev server on `:4200` with the API proxy enabled |
+| `npm run build` | Production build into `dist/` |
+| `npm run watch` | Rebuild on change (development configuration) |
+| `npm test` | Unit tests with Jasmine + Karma |
+
+<img src=".github/assets/divider.svg" width="100%" alt=""/>
+
+## 📁 Project structure
+
+```text
+src/
+├── app/
+│   ├── core/                 # app-wide plumbing
+│   │   ├── guards/           # authGuard, roleGuard
+│   │   ├── interceptors/     # authInterceptor, apiCaseInterceptor
+│   │   ├── models/           # typed DTOs per domain
+│   │   └── services/         # one HTTP service per API area
+│   ├── features/             # lazy-loaded routes
+│   │   ├── auth/             #   login
+│   │   ├── dashboard/        #   role-aware overview
+│   │   ├── employees/        #   list + form
+│   │   ├── departments/
+│   │   ├── salary/           #   list + revision history
+│   │   ├── bonuses/
+│   │   ├── deductions/
+│   │   ├── payroll/
+│   │   └── users/            #   Admin only
+│   └── shared/
+│       ├── components/       # header, sidebar, layout, toast-container
+│       ├── services/         # toast.service
+│       └── styles/           # _ui.scss design tokens
+└── environments/             # apiUrl per build configuration
 ```
 
-### Run Tests
+<details>
+<summary><b>🔌 Backend endpoints this client expects</b></summary>
+<br/>
 
-```bash
-npm test
-```
+The client calls the API under `/api` for these areas:
 
-## Available Scripts
+`auth` · `users` · `employees` · `departments` · `salary` · `payroll` · `bonuses` · `deductions` · `dashboard`
 
-| Script | Description |
-| --- | --- |
-| `npm start` | Starts the development server with the API proxy enabled. |
-| `npm run build` | Builds the app into `dist/`. |
-| `npm run watch` | Rebuilds on file changes in development mode. |
-| `npm test` | Runs the unit test suite. |
+If the API contract changes, update the matching service and model in [`src/app/core/`](src/app/core).
 
-## Architecture Notes
+</details>
 
-- Authentication state is stored locally and used by guards, interceptors, and layout UI.
-- The app uses lazy-loaded feature routes to keep the initial bundle focused.
-- API responses are normalized to camelCase on the client so feature components can bind consistently.
-- The shared layout renders the main shell while feature modules handle their own page content.
+<details>
+<summary><b>🎨 Design tokens</b></summary>
+<br/>
 
-## Environment
+Shared colors and typography are defined once in [`_ui.scss`](src/app/shared/styles/_ui.scss):
 
-Environment-specific API URLs are configured in:
+| Token | Value | |
+| :-- | :-- | :-: |
+| `--navy` | `#071a3d` | ![](https://img.shields.io/badge/-%20%20%20%20-071a3d?style=flat-square) |
+| `--blue` | `#416fb5` | ![](https://img.shields.io/badge/-%20%20%20%20-416fb5?style=flat-square) |
+| `--accent` | `#0f766e` | ![](https://img.shields.io/badge/-%20%20%20%20-0f766e?style=flat-square) |
+| `--success` | `#0f9f6e` | ![](https://img.shields.io/badge/-%20%20%20%20-0f9f6e?style=flat-square) |
+| `--warning` | `#b7791f` | ![](https://img.shields.io/badge/-%20%20%20%20-b7791f?style=flat-square) |
+| `--danger` | `#dc2626` | ![](https://img.shields.io/badge/-%20%20%20%20-dc2626?style=flat-square) |
 
-- `src/environments/environment.ts`
-- `src/environments/environment.production.ts`
+</details>
 
-## Backend Integration
+<details>
+<summary><b>🌍 Environments</b></summary>
+<br/>
 
-This frontend expects a backend that exposes endpoints for:
+| File | Used by |
+| :-- | :-- |
+| [`environment.ts`](src/environments/environment.ts) | `ng serve`, development builds |
+| [`environment.production.ts`](src/environments/environment.production.ts) | `ng build` (production) |
 
-- authentication
-- users
-- employees
-- departments
-- salary
-- payroll
-- bonuses
-- deductions
-- dashboard
+> [!IMPORTANT]
+> `environment.production.ts` still has a placeholder `apiUrl` (`https://your-production-api.com/api`). Set the real API URL before you deploy.
 
-If the backend contract changes, update the matching service and model files in `src/app/core/`.
+</details>
 
-## Notes
+<br/>
 
-- Login and dashboard flows rely on role-aware session data.
-- Admin and HR users can access management features.
-- Employees see their own dashboard data only.
+<div align="center">
 
-## Further Help
+**Built with Angular & ☕**
 
-Use `npm run ng -- help` or the [Angular CLI documentation](https://angular.dev/tools/cli) for additional commands and generation options.
+<a href="#top">⬆ Back to top</a>
+
+<img src=".github/assets/footer.svg" alt="" width="100%"/>
+
+</div>
